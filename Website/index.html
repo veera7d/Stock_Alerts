@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Our Funky HTML Page</title>
+        <meta name="description" content="Our first page">
+        <meta name="keywords" content="html tutorial template">
+        <script src="script.js"></script>
+    </head>
+    <body>
+        <table id="view_data">
+            <tr>
+                <th>stock</th>
+                <th>condition</th>
+                <th>value</th>
+                <th>edit</th>
+                <th>delete</th>
+            </tr>
+        </table>
+        <br>
+        <table id="input">
+            <tr>
+                <th>stock</th>
+                <th>condition</th>
+                <th>value</th>
+                <th>add</th>
+            </tr>
+            <tr>
+                <form id="input_form">
+                    <td><input id="stock" type="text" name="stock"></td>
+                    <td><select id="cond" name="cond">
+                        <option value="greater than">greater than</option>
+                        <option value="less than">less than</option>
+                        <option value="greater than eql">greater than eql</option>
+                        <option value="les than eql">les than eql</option>
+                      </select></td>
+                    <td><input id="value" type="number" name="value"></td>
+                </form>
+                <td><button type="button" onclick="inputt()">add</button></td>
+            </tr>
+        </table>
+    </body>
+</html>
