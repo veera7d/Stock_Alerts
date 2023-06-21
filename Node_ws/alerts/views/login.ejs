@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>login page</title>
+        <script>
+function login(){
+    var uname = document.getElementById("uname").value
+    console.log(uname)
+    var password = document.getElementById('password').value
+    console.log(password)
+    var jobj={"uname":uname,"password":password}
+    doReq(JSON.stringify(jobj))
+}
+async function doReq(jsonobj){
+    let res= await fetch('http://localhost:8080/login',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:jsonobj
+    })
+    if(res.ok){
+        console.log(await res.text())
+    }
+    else{
+        console.log('error '+ res.status)
+    }
+}
+        </script>
+    </head>
+    <body>
+        <form>
+            <input type="text" name="uname" id="uname"><br>
+            <input type="password" name="password" id="password"><br>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+    </body>
+</html>
