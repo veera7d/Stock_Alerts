@@ -1,6 +1,6 @@
 # Stock_Alerts
-get the alerts of the stocks listed in National stock exchange(NSE).
+get alerts of the stocks listed in the National stock exchange(NSE).
 
--> Website folder will have the html and javascript fiels fro frontend.
--> Node_ws folder contains a asmple express app
--> Logic folder contains python files to validate eirher the condition was meat or not for the current lit of the stock
+-> Website folder will have the html and javascript fields from the front end.
+-> Node_ws folder contains a simple express app that will host the website and save the rules from the user to the backend Mongo DB.
+-> Logic folder contains Python files to validate whether the condition was meat or not for the current list of the stock.
