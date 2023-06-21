@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Alerts</title>
+        <script>
+function addtolist(stock,con,val){
+    validate(stock).then((data)=>{
+        console.log(data)
+        if(data=='no'){
+            window.alert("Stock not present in NSE")
+            return
+        }
+        console.log('in add to list')
+        var table=document.getElementById("view_data");
+        var row=table.insertRow(-1);
+        var stockcell=row.insertCell(0);
+        var condcell=row.insertCell(1);
+        var valcell=row.insertCell(2);
+        var editcell=row.insertCell(3);
+        var delcell = row.insertCell(4);
+        stockcell.innerHTML = stock;
+        condcell.innerHTML = con;
+        valcell.innerHTML = val;
+        delcell.innerHTML = "<button type='button' onclick='delrowbutton(this)'>delete</button>";
+        editcell.innerHTML = "<button class='edit_button' type='button' onclick='editrow(this)'>edit</button>";
+    }).catch((ex)=>{
+        console.log(ex)
+        return
+    })
+}
+
+function inputt(){
+    var stock=document.getElementById("stock").value;
+    var cond=document.getElementById("cond").value;
+    var val=document.getElementById("value").value;
+    addtolist(stock,cond,val);
+}
+
+function editrow(element){
+    disable_all_edit_button(true);
+    var ele_index=element.parentNode.parentNode.rowIndex;
+    var tablee=document.getElementById("view_data");
+    var cells=tablee.rows[ele_index].cells;
+    deleterow(ele_index)
+    var row=tablee.insertRow(ele_index);
+    var stockcell=row.insertCell(0);
+    var condcell=row.insertCell(1);
+    var valcell=row.insertCell(2);
+    var savecell=row.insertCell(3);
+    var delcell = row.insertCell(4);
+    stockcell.innerHTML = '<input id="view_stock" type="text" name="stock">';
+    condcell.innerHTML = '<select id="view_cond" name="cond"><option value="greater than">greater than</option><option value="less than">less than</option><option value="greater than eql">greater than eql</option><option value="les than eql">les than eql</option></select>';
+    valcell.innerHTML = '<input id="view_value" type="number" name="value">';
+    delcell.innerHTML = "<button type='button' onclick='delrowbutton(this)'>delete</button>";
+    savecell.innerHTML = "<button type='button' onclick='saverow(this)'>save</button>";
+    document.getElementById("view_stock").value=cells[0].innerHTML;
+    if(cells[1].innerHTML=="greater than"){
+        document.getElementById("view_cond").selectedIndex=0;
+    }else if(cells[1].innerHTML=="less than"){
+        document.getElementById("view_cond").selectedIndex=1;
+    }else if(cells[1].innerHTML=="greater than eql"){
+        document.getElementById("view_cond").selectedIndex=2;
+    }else if(cells[1].innerHTML=="les than eql"){
+        document.getElementById("view_cond").selectedIndex=3;
+    }
+    document.getElementById("view_value").value=cells[2].innerHTML;
+
+}
+
+function saverow(element){
+    disable_all_edit_button(false);
+    var ele_index=element.parentNode.parentNode.rowIndex;
+    var tablee=document.getElementById("view_data");
+    var row=tablee.insertRow(ele_index);
+    var stockcell=row.insertCell(0);
+    var condcell=row.insertCell(1);
+    var valcell=row.insertCell(2);
+    var editcell=row.insertCell(3);
+    var delcell = row.insertCell(4);
+    editcell.innerHTML="<button type='button' onclick='editrow(this)'>edit</button>";
+    delcell.innerHTML="<button type='button' onclick='delrowbutton(this)'>delete</button>";
+    condcell.innerHTML=document.getElementById("view_cond").value;
+    stockcell.innerHTML=document.getElementById("view_stock").value;
+    valcell.innerHTML=document.getElementById("view_value").value;
+    deleterow(ele_index+1)
+}
+
+function delrowbutton(element){
+    disable_all_edit_button(false);
+    deleterow(element.parentNode.parentNode.rowIndex);
+}
+
+function deleterow(indexx){
+    var table=document.getElementById('view_data');
+    table.deleteRow(indexx);
+}
+
+function disable_all_edit_button(bool){
+    var edit_buttons=document.getElementsByClassName("edit_button");
+    console.log(edit_buttons.length);
+    for (let i=0;i<edit_buttons.length;i++){
+        edit_buttons[i].disabled=bool;
+    }
+}
+
+function getAllFormData(){
+    data={"stocks":[],"condition":[],"value":[]}
+    stocks=[]
+    condition=[]
+    value=[]
+    //let table=document.getElementById('input_form')
+    td_data=document.getElementsByTagName('td')
+    var i=0
+    for(i=0;i<td_data.length-4;i++){
+        temp=i%5
+        if(temp==3 || temp==4){
+            continue
+        }
+        else if(temp==0){
+            stocks.push(td_data[i].innerHTML)
+            data['stocks'].push(td_data[i].innerHTML)
+        }else if(temp==1){
+            condition.push(td_data[i].innerHTML)
+            data['condition'].push(td_data[i].innerHTML)
+        }else if(temp==2){
+            value.push(td_data[i].innerHTML)
+            data['value'].push(td_data[i].innerHTML)
+        }
+    }
+    return JSON.stringify(data)
+}
+
+async function saverules(){
+    jsonobj=getAllFormData()
+    let res= await fetch('http://localhost:8080/saverules',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:jsonobj
+    })
+    if(res.ok){
+        console.log(await res.text())
+    }
+    else{
+        console.log('error '+ res.status)
+    }
+}
+
+async function validate(stock){
+    data=JSON.stringify({"stock":stock})
+    let res = await fetch('http://localhost:8080/validatedata',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:data
+    })
+    if(res.ok){
+        var body=await res.text()
+        console.log(body)
+        return body
+    }
+    else{
+        console.log('error '+ res.status)
+        return 0
+    }
+}
+
+        </script>
+    </head>
+    <body>
+        <table id="view_data">
+            <tr>
+                <th>stock</th>
+                <th>condition</th>
+                <th>value</th>
+                <th>edit</th>
+                <th>delete</th>
+            </tr>
+        </table>
+        <br>
+        <table id="input">
+            <tr>
+                <th>stock</th>
+                <th>condition</th>
+                <th>value</th>
+                <th>add</th>
+            </tr>
+            <tr>
+                <form id="input_form">
+                    <td><input id="stock" type="text" name="stock" required></td>
+                    <td><select id="cond" name="cond">
+                        <option value="greater than">greater than</option>
+                        <option value="less than">less than</option>
+                        <option value="greater than eql">greater than eql</option>
+                        <option value="les than eql">les than eql</option>
+                      </select></td>
+                    <td><input id="value" type="number" name="value" value=0 required></td>
+                </form>
+                <td><button onclick="inputt()">add</button></td>
+            </tr>
+        </table>
+        <button onclick="saverules()">Save</button>
+    </body>
+</html>
